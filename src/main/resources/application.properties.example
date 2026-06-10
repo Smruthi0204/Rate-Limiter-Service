@@ -1,0 +1,9 @@
+spring.application.name=rate-limiter-service
+server.port=8081
+spring.datasource.url=jdbc:postgresql://localhost:5433/RateLimiter
+spring.datasource.username=your-username
+spring.datasource.password=your-password
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
