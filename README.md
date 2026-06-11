@@ -117,6 +117,4 @@ This service was load tested using Apache JMeter with 100 concurrent virtual use
 
 > 45.7% error rate represents requests correctly blocked by the rate limiter returning 429 Too Many Requests — not server errors.
 
---
-
 ![JMeter Results](jmeterTesting.png)
