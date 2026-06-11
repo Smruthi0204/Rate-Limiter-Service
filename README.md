@@ -19,7 +19,7 @@ This project is a standalone microservice that lets any backend application enfo
 ## System Architecture
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/4fd85187-fe1e-445c-88d9-175d5d35537f" alt="System Architecture" width="100%">
+  <img src="Architecture Diagram.jpg" alt="System Architecture" width="100%">
 </p>
 
 ---
