@@ -82,16 +82,16 @@ Each registered client has a hash stored in Redis:
 
 ---
 
-## Limitations and Future Improvements
+## Current Limitations and Future Improvements
 
 **Horizontal scaling limitation**
-Currently uses ReentrantLock for thread safety within a single instance. Running multiple instances would allow the same client to exceed their limit since locks are not shared across instances. This can be resolved by replacing ReentrantLock with Redis Lua scripts to make the read-calculate-write operation atomic inside Redis itself, eliminating the need for application-level locking entirely.
+Currently ReentrantLock is used for thread safety within a single instance. Running multiple instances would allow the same client to exceed their limit since locks are not shared across instances. This can be resolved by replacing ReentrantLock with Redis Lua scripts to make the read-calculate-write operation atomic inside Redis itself, eliminating the need for application-level locking entirely.
 
 **No authentication on endpoints**
 Any application can register a client or check rate limits without any form of authentication. Adding authentication would prevent unauthorised access to the service.
 
 **Fixed token bucket per client**
-Currently each client has one bucket covering all their API usage. Supporting per-endpoint rate limits — different limits for different endpoints of the same client — would make the service more granular and production ready.
+Currently each client has one bucket covering all their API usage. Supporting per-endpoint rate limits, which is different limits for different endpoints of the same client would make the service more granular and production ready.
 
 ---
 
