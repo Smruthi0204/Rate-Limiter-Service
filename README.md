@@ -93,6 +93,8 @@ Any application can register a client or check rate limits without any form of a
 **Fixed token bucket per client**
 Currently each client has one bucket covering all their API usage. Supporting per-endpoint rate limits — different limits for different endpoints of the same client — would make the service more granular and production ready.
 
+---
+
 ## Performance Benchmarks
 
 This service was load tested using Apache JMeter with 100 concurrent virtual users against the service deployed on AWS EC2.
@@ -114,5 +116,7 @@ This service was load tested using Apache JMeter with 100 concurrent virtual use
 | Error % | 45.7% |
 
 > 45.7% error rate represents requests correctly blocked by the rate limiter returning 429 Too Many Requests — not server errors.
+
+--
 
 ![JMeter Results](jmeterTesting.png)
