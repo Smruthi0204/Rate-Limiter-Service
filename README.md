@@ -24,6 +24,41 @@ This project is a standalone microservice that lets any backend application enfo
 
 ---
 
+## Event Flow
+
+### Registration
+1. Receive client details — clientId, capacity, refillRate
+2. Check if clientId already exists — return error if it does
+3. Save client configuration to PostgreSQL
+4. Initialise token bucket in Redis
+5. Create a ReentrantLock for this client in memory
+6. Return 201 Created
+
+### Check
+1. Look up ReentrantLock for this clientId — return 429 if not found
+2. Acquire the lock
+3. If bucket missing in Redis — reload from PostgreSQL and reinitialise
+4. Read token state from Redis
+5. Calculate elapsed time and refill tokens accordingly
+6. If tokens available — consume one and allow
+7. If no tokens — block
+8. Write updated token state back to Redis
+9. Release lock
+10. Return 200 if allowed, 429 if blocked
+
+### Server Startup
+1. Load all clients from PostgreSQL
+2. For each client initialise bucket in Redis if not already present
+3. Create ReentrantLock for each client in memory
+4. Server ready to accept requests
+
+### Dashboard
+1. Browser opens dashboard.html
+2. JavaScript calls GET /api/metrics every 3 seconds
+3. Page updates with latest request counts automatically
+
+---
+
 ## API Endpoints
 
 | Method | Endpoint | Description | Request Body |
@@ -118,3 +153,5 @@ This service was load tested using Apache JMeter with 100 concurrent virtual use
 > 45.7% error rate represents requests correctly blocked by the rate limiter returning 429 Too Many Requests — not server errors.
 
 ![JMeter Results](jmeterTesting.png)
+
+---
