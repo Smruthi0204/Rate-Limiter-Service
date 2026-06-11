@@ -1,6 +1,6 @@
 # Rate Limiter as a Service
 
-This project is a standalone microservice that lets any backend application enforce API rate limits without building the logic themselves. Register a client, set a capacity and refill rate, and the service handles the rest — using the token bucket algorithm with Redis for fast token state and PostgreSQL for persistent storage. The project is also fully dockerized and deployed on AWS EC2.
+This project is a standalone microservice that lets any backend application enforce API rate limits without building the logic themselves. Register a client, set a capacity and refill rate, and the service handles the rest using the token bucket algorithm with Redis for fast token state and PostgreSQL for persistent storage. The project is also fully dockerized and deployed on AWS EC2.
 
 ---
 
@@ -39,19 +39,19 @@ This project is a standalone microservice that lets any backend application enfo
 ## Design Decisions
 
 **Why Token Bucket over other algorithms?**
-There are several rate limiting algorithms — Fixed Window, Sliding Window, Leaky Bucket, Token Bucket. Fixed Window is simple but has a boundary problem where clients can get double their limit by timing requests at window edges. Sliding Window is accurate but memory intensive. Token Bucket strikes the right balance — it handles burst traffic naturally, refills smoothly over time and is straightforward to implement with time-based state. It is the algorithm used by most real-world APIs including Stripe and AWS.
+There are several rate limiting algorithms — Fixed Window, Sliding Window, Leaky Bucket, Token Bucket. Fixed Window is simple but has a boundary problem where clients can get double their limit by timing requests at window edges. Sliding Window is accurate but memory intensive. Token Bucket strikes the right balance as it handles burst traffic naturally, refills smoothly over time and is straightforward to implement with time-based state. It is the algorithm used by most real-world APIs including Stripe and AWS.
 
 **Why Redis for token state?**
-Every single check request reads and updates token state. If this lived in PostgreSQL, every API call would hit the database — that is expensive and slow at scale. Redis lives in memory, making reads and writes sub-millisecond. It is the right tool for data that changes constantly and needs to be accessed fast.
+Every single check request reads and updates token state. If this lived in PostgreSQL, every API call would hit the database which is expensive and slow at scale. Redis lives in memory, making reads and writes sub-millisecond. It is the right tool for data that changes constantly and needs to be accessed fast.
 
 **Why PostgreSQL for client configuration?**
-Client configuration — who is registered and what their limits are — needs to survive server restarts. PostgreSQL provides this durability. Redis is an in-memory store and loses all data when restarted, making it unsuitable as the sole storage for client configuration.
+Client configuration (who is registered and what their limits are) needs to survive server restarts. PostgreSQL provides this durability. Redis is an in-memory store and loses all data when restarted, making it unsuitable as the sole storage for client configuration.
 
 **Why per-client locking instead of a global lock?**
-Only concurrent requests for the same client share state and risk race conditions. A global lock unnecessarily serialises requests across all clients. Using a ConcurrentHashMap of ReentrantLocks gives each client an independent lock — different clients run in parallel while correctness is still maintained within each client.
+Only concurrent requests for the same client share state and risk race conditions. A global lock unnecessarily serialises requests across all clients. Using a ConcurrentHashMap of ReentrantLocks gives each client an independent lock and different clients run in parallel while correctness is still maintained within each client.
 
 **Why both PostgreSQL and Redis together?**
-PostgreSQL and Redis serve fundamentally different purposes in this system. Client configuration is written once and must persist across restarts — PostgreSQL handles this. Token state changes on every request and must be accessed with minimal latency — Redis handles this. Neither alone is sufficient, and together they eliminate each other's weaknesses.
+PostgreSQL and Redis serve fundamentally different purposes in this system. Client configuration is written once and must persist across restarts - PostgreSQL handles this. Token state changes on every request and must be accessed with minimal latency - Redis handles this. Neither alone is sufficient, and together they eliminate each other's weaknesses.
 
 ---
 
