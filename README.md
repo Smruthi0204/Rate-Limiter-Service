@@ -139,6 +139,9 @@ This service was load tested using Apache JMeter with 100 concurrent virtual use
 - Virtual Users: 100
 - Total Requests: 1000
 - Endpoint: `POST /api/clients/{clientId}/check`
+- Capacity: 500
+- Refill Rate: 50
+- Client ID used in testing: AZB1Q1 
 
 **Results**
 
